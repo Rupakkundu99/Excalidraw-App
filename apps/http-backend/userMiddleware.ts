@@ -4,7 +4,7 @@ import { NextFunction,Response,Request } from 'express'
 
 dotenv.config()
 
-function Auth(req:Request,res:Response,next:NextFunction){
+export function Auth(req:Request,res:Response,next:NextFunction){
     const token=req.headers.authorization
 
     if(!token){
@@ -12,13 +12,13 @@ function Auth(req:Request,res:Response,next:NextFunction){
             message:"Token required for user Authentication"
         })
     }
-
+    //@ts-ignore 
     const decodedToken=jwt.verify(token,process.env.JWT_SECRET)
 
     if(decodedToken){
-        res.json({
-            message:"User Authenticated Successfully"
-        })
+        //@ts-ignore
+        req.userId=decodedToken.userId
+
         next()
     }
     else{
