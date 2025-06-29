@@ -12,7 +12,8 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@repo/common":"workspace:*"
   },
   "dependencies": {
     "@types/express": "^5.0.3",

@@ -1,8 +1,8 @@
 import express from 'express'
-import zod from 'zod'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import { Auth } from './userMiddleware'
+import {CreateRoomSchema, CreateUserSchema, SigninSchema} from '@repo/common/types'
 
 const app=express()
 
@@ -13,15 +13,9 @@ dotenv.config()
 app.post('/signin',async(req,res)=>{
     const body=req.body
 
-    const signUpschema=zod.object({
-        email:zod.string().max(25).min(6),
-        password:zod.string().max(25).min(6).regex(/[A-Z]/,"Password must have an uppercase letter")
-        .regex(/[a-z]/,"It must have a small letter")
-        .regex(/[^A-Za-z0-9]/,"Must have a special character"),
-    })
+    const data=CreateUserSchema.safeParse(body)
 
-    const parseData=signUpschema.safeParse(body)
-    if(!parseData){
+    if(!data.success){
         res.json({
             message:"Incorrect signup Credentials"
         })
@@ -35,7 +29,14 @@ app.post('/signin',async(req,res)=>{
 //@ts-ignore
 
 app.post('/signin', async (req, res, next) => {
-    const body = req.body;
+    
+    const data=SigninSchema.safeParse(req.body)
+    if(!data.success){
+        res.json({
+            message:"Incorrect signin Credentials"
+        })
+    }
+
     const userId = 1;
     
     const jwtSecret = process.env.JWT_SECRET;
@@ -59,7 +60,15 @@ app.post('/signin', async (req, res, next) => {
 });
 
 app.post('/room',Auth,(req,res)=>{
-    
+    const data=CreateRoomSchema.safeParse(req.body)
+    if(!data.success){
+        res.json({
+            message:"Incorrect room details"
+        })
+    }
+    res.json({
+        message:"Room created successfully"
+    })
 })
 
 app.listen(3001)
