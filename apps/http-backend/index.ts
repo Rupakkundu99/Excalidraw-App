@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import { Auth } from './userMiddleware'
 import {CreateRoomSchema, CreateUserSchema, SigninSchema} from '@repo/common/types'
+import {prismaClient} from '@repo/db'
 
 const app=express()
 
