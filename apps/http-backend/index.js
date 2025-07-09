@@ -55,18 +55,29 @@ app.post('/signin', (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             message: "Incorrect signin Credentials"
         });
     }
-    const userId = 1;
+    const user = yield db_1.prismaClient.user.findFirst({
+        where: {
+            email: req.body.email,
+            password: req.body.password
+        }
+    });
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
         return res.status(500).json({
             message: "JWT secret is not defined in environment variables."
         });
     }
-    const token = jsonwebtoken_1.default.sign({ userId }, jwtSecret);
+    if (!user) {
+        return res.status(500).json({
+            message: "User not found signUp again to continue"
+        });
+    }
+    const token = jsonwebtoken_1.default.sign({
+        userId: user === null || user === void 0 ? void 0 : user.id
+    }, jwtSecret);
     res.status(200).json({
         token: token,
-        message: "Sign in successful",
-        jwtToken: token
+        message: "Sign in successful"
     });
 }));
 app.post('/room', userMiddleware_1.Auth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,6 +99,32 @@ app.post('/room', userMiddleware_1.Auth, (req, res) => __awaiter(void 0, void 0,
     res.json({
         message: "Room created successfully",
         roomId: room.id
+    });
+}));
+app.get('/chats/:roomId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const roomId = Number(req.params.roomId);
+    const messages = yield db_1.prismaClient.chat.findMany({
+        where: {
+            roomId: roomId
+        },
+        orderBy: {
+            id: "desc"
+        },
+        take: 100
+    });
+    res.json({
+        messages
+    });
+}));
+app.get("/room/:slug", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const slug = req.params.slug;
+    const room = yield db_1.prismaClient.room.findFirst({
+        where: {
+            slug
+        }
+    });
+    res.json({
+        room
     });
 }));
 app.listen(3001);
