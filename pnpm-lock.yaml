@@ -20,6 +20,9 @@ importers:
 
   apps/excaldiraw-app:
     dependencies:
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       axios:
         specifier: ^1.10.0
         version: 1.10.0
